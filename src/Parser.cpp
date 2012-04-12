@@ -16,12 +16,18 @@ void Parser::treatLine(const std::string &line)
 	{
 		currentName = parseName(line);
 	}
-	else if(line[0] != '\t')
+	else if(line[0] == '\t')
 	{
 		std::vector <std::string> attribute = parseAttribute(line);
 
 		if(attribute[0].compare("current_state") == 0)
-			services[currentName] = getStatus(attribute[1]);
+		{
+			Parser::Status tmp = getStatus(attribute[1]);
+			services[currentName] = tmp;
+			Parser::Status tmp2 = services[currentName];
+			int a = 0;
+			a++;
+		}
 
 		//currentAttribute = attribute[0];
 		//currentStatus = getStatus(attribute[1]);
@@ -84,16 +90,16 @@ std::vector <std::string> Parser::parseAttribute(const std::string &name)
 
 	while(i < name.size() && c != '=')
 	{
-		key += c;
 		c = name[i];
+		if(c != '=')
+			key += c;
 		i++;
 	}
 
-	i++;
 	while(i < name.size())
 	{
-		val += c;
 		c = name[i];
+		val += c;
 		i++;
 	}
 
@@ -112,8 +118,8 @@ std::string Parser::parseName(const std::string &name)
 
 	while(i < name.size() && c != ' ')
 	{
-		result += c;
 		c = name[i];
+		result += c;
 		i++;
 	}
 
