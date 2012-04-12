@@ -59,7 +59,7 @@ int main()
 {
 	stringstream ss;
 	
-	string filename = "/tmp/status.dat";
+	string filename = "/home/freddy/tmp/Nagios-check/status.dat";
 	ss << "scp -q root@monitoring.serieslive.com:/usr/local/nagios/var/status.dat " << filename;
 	
 	//system(ss.str().c_str());
