@@ -7,7 +7,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBNOTIFY libnotify REQUIRED)
 
-include_directories(${LIBNOTIFY_INCLUDE_DIR})
+include_directories(${LIBNOTIFY_INCLUDE_DIRS})
 
 set(mainLibs ${LIBNOTIFY_LIBRARIES})
 

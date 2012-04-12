@@ -12,28 +12,110 @@ Parser::Parser()
 
 void Parser::treatLine(const std::string &line)
 {
-	if(line[0] != '#' && line[0] != '\n' && line[0] != '\t')
+	if(!line.empty() && line[0] != '#' && line[0] != '\t')
 	{
-		//currentName = line;
-		std::cout << parseName(line) << std::endl;
+		currentName = parseName(line);
+	}
+	else if(line[0] != '\t')
+	{
+		std::vector <std::string> attribute = parseAttribute(line);
+
+		if(attribute[0].compare("current_state") == 0)
+			services[currentName] = getStatus(attribute[1]);
+
+		//currentAttribute = attribute[0];
+		//currentStatus = getStatus(attribute[1]);
+//		if(attribute[0].compare("current_state") == 0)
+//		{
+//			currentStatus = getStatus(attribute[1]);
+//		}
+	}
+
+	std::cout << currentName << " " << currentAttribute << " " << currentStatus << std::endl;
+}
+
+Parser::Status Parser::getStatus(const std::string &name)
+{
+	if(name.compare("0") == 0)
+	{
+		return Parser::OK;
+	}
+	else if(name.compare("1") == 0)
+	{
+		return Parser::UNKNOWN;
+	}
+	else if(name.compare("2") == 0)
+	{
+		return Parser::UNKNOWN;
+	}
+	else if(name.compare("3") == 0)
+	{
+		return Parser::UNKNOWN;
+	}
+	else
+	{
+		return Parser::UNKNOWN;
 	}
 }
 
 std::string Parser::getAlert()
 {
-	return currentAlerte;
+	std::map < std::string , Parser::Status>::iterator it;
+	std::string alert = "Not OK services :\n";
+
+	for(it = services.begin(); it != services.end(); it++)
+	{
+		Parser::Status st = it->second;
+		if(st != Parser::OK)
+			alert += it->first + "\n";
+	}
+
+	return alert;
+}
+
+std::vector <std::string> Parser::parseAttribute(const std::string &name)
+{
+	std::vector <std::string> result;
+	int i = 1;
+	char c = '\0';
+	std::string key = "";
+	std::string val = "";
+	c = name[i];
+
+	while(i < name.size() && c != '=')
+	{
+		key += c;
+		c = name[i];
+		i++;
+	}
+
+	i++;
+	while(i < name.size())
+	{
+		val += c;
+		c = name[i];
+		i++;
+	}
+
+	result.push_back(key);
+	result.push_back(val);
+
+	return result;
 }
 
 std::string Parser::parseName(const std::string &name)
 {
 	std::string result = "";
 	int i = 0;
-	char c;
-	do{
-		c = name[i];
+	char c = '\0';
+	c = name[i];
+
+	while(i < name.size() && c != ' ')
+	{
 		result += c;
+		c = name[i];
 		i++;
-	}while(c != ' ');
+	}
 
 	return result;
 }

@@ -57,15 +57,21 @@ string read(const string &filename)
 
 int main()
 {
-	string orig = readFile();
-	string current = orig;
 	stringstream ss;
 	
 	string filename = "/tmp/status.dat";
 	ss << "scp -q root@monitoring.serieslive.com:/usr/local/nagios/var/status.dat " << filename;
 	
-	system(ss.str().c_str());
-	read(filename);
+	//system(ss.str().c_str());
+	std::string alert = read(filename);
+
+	notify_init("verify");
+	NotifyNotification * notif = notify_notification_new (
+		"Check result :",
+				alert.c_str(),
+		"dialog-information");
+	notify_notification_show (notif, NULL);
+
 	/*
  while(1)
  {

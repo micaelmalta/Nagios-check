@@ -1,7 +1,9 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+#include <map>
 #include <string>
+#include <vector>
 
 class Parser
 {
@@ -20,11 +22,15 @@ private:
 	};
 
 	std::string parseName(const std::string &name);
+	Parser::Status getStatus(const std::string &name);
+	std::vector <std::string> parseAttribute(const std::string &name);
 
 	std::string currentAlerte;
 	std::string currentAttribute;
 	std::string currentName;
 	Parser::Status currentStatus;
+
+	std::map < std::string , Parser::Status> services;
 };
 
 #endif // PARSER_HPP
