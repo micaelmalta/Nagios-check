@@ -4,9 +4,9 @@
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include "Parser.hpp"
 
 using namespace std;
-
 
 string readFile()
 {
@@ -26,29 +26,33 @@ string readFile()
 
 string read(const string &filename)
 {
+	Parser *parser = new Parser();
+
 	string line;
+
 	ifstream myfile (filename.c_str());
 	if (myfile.is_open())
 	{
 		while ( myfile.good() )
 		{
-		  getline (myfile,line);
-		  
-		  cout << line << endl;
+			getline (myfile,line);
+			parser->treatLine(line);
 		}
 		myfile.close();
 	}
 
 	else cout << "Unable to open file"; 
 	
-	return line;
+	std::string alerte = parser->getAlert();
+
+	delete parser;
+
+	return alerte;
 	
 }
 
-string parse(line)
-{
-	
-}
+
+
 
 
 int main()
@@ -63,24 +67,24 @@ int main()
 	system(ss.str().c_str());
 	read(filename);
 	/*
-	while(1)
-	{
-		sleep(1);
-		current = readFile();
-		if(current.compare(orig) != 0)
-		{
-			ss.str("");
-			notify_init("verify");
-			ss << "myfile.txt has changed :" << endl;
-			ss << "from '" << orig << "' to '" << current << "'" << endl;
-			NotifyNotification * notif = notify_notification_new (
-												"Change!",
-												ss.str().c_str(),
-												"dialog-information");
-			notify_notification_show (notif, NULL);
-			orig = current;
-		}
-	}*/
+ while(1)
+ {
+  sleep(1);
+  current = readFile();
+  if(current.compare(orig) != 0)
+  {
+ ss.str("");
+ notify_init("verify");
+ ss << "myfile.txt has changed :" << endl;
+ ss << "from '" << orig << "' to '" << current << "'" << endl;
+ NotifyNotification * notif = notify_notification_new (
+	 "Change!",
+	 ss.str().c_str(),
+	 "dialog-information");
+ notify_notification_show (notif, NULL);
+ orig = current;
+  }
+ }*/
 	
 	return 0;
 }
