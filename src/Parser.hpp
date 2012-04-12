@@ -21,6 +21,13 @@ private:
 		PENDING
 	};
 
+	struct ServiceStatus{
+		std::string hostName;
+		std::string serviceName;
+		std::string output;
+		Parser::Status status;
+	};
+
 	std::string parseName(const std::string &name);
 	Parser::Status getStatus(const std::string &name);
 	std::vector <std::string> parseAttribute(const std::string &name);
@@ -28,9 +35,12 @@ private:
 	std::string currentAlerte;
 	std::string currentAttribute;
 	std::string currentName;
+	std::string currentHostName;
+	std::string currentOutput;
+	std::string currentServiceName;
 	Parser::Status currentStatus;
 
-	std::map < std::string , Parser::Status> services;
+	std::vector <ServiceStatus>  services;
 };
 
 #endif // PARSER_HPP

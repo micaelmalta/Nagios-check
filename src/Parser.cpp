@@ -3,10 +3,13 @@
 
 Parser::Parser()
 {
-	currentName = "";
-	currentAttribute = "";
-	currentStatus = Parser::OK;
 	currentAlerte = "";
+	currentAttribute = "";
+	currentHostName = "";
+	currentName = "";
+	currentOutput = "";
+	currentServiceName = "";
+	currentStatus = Parser::OK;
 }
 
 
@@ -20,24 +23,48 @@ void Parser::treatLine(const std::string &line)
 	{
 		std::vector <std::string> attribute = parseAttribute(line);
 
-		if(attribute[0].compare("current_state") == 0)
+		if(attribute[0].compare("host_name") == 0)
 		{
-			Parser::Status tmp = getStatus(attribute[1]);
-			services[currentName] = tmp;
-			Parser::Status tmp2 = services[currentName];
-			int a = 0;
-			a++;
+			currentHostName = attribute[1];
 		}
 
-		//currentAttribute = attribute[0];
-		//currentStatus = getStatus(attribute[1]);
-//		if(attribute[0].compare("current_state") == 0)
-//		{
-//			currentStatus = getStatus(attribute[1]);
-//		}
+		if(attribute[0].compare("service_description") == 0)
+		{
+			currentServiceName = attribute[1];
+		}
+
+		if(attribute[0].compare("current_state") == 0)
+		{
+			currentStatus = getStatus(attribute[1]);
+		}
+
+		if(attribute[0].compare("plugin_output") == 0)
+		{
+			currentOutput = attribute[1];
+		}
+
+		if(attribute[0].compare("}") == 0 && currentName.compare("servicestatus") == 0)
+		{
+			ServiceStatus status;
+
+			status.hostName = currentHostName;
+			status.serviceName = currentServiceName;
+			status.status = currentStatus;
+			status.output = currentOutput;
+
+			services.push_back(status);
+
+			currentAlerte = "";
+			currentAttribute = "";
+			currentHostName = "";
+			currentName = "";
+			currentOutput = "";
+			currentServiceName = "";
+			currentStatus = Parser::OK;
+		}
+
 	}
 
-	std::cout << currentName << " " << currentAttribute << " " << currentStatus << std::endl;
 }
 
 Parser::Status Parser::getStatus(const std::string &name)
@@ -66,16 +93,21 @@ Parser::Status Parser::getStatus(const std::string &name)
 
 std::string Parser::getAlert()
 {
-	std::map < std::string , Parser::Status>::iterator it;
-	std::string alert = "Not OK services :\n";
+	std::vector <ServiceStatus>::iterator it;
+	std::string alert = "";
 
 	for(it = services.begin(); it != services.end(); it++)
 	{
-		Parser::Status st = it->second;
-		if(st != Parser::OK)
-			alert += it->first + "\n";
+		ServiceStatus status = *it;
+		if(status.status != Parser::OK)
+		{
+			alert += status.hostName + " : " + status.serviceName + "\n" + status.output + "\n\n";
+		}
 	}
-
+	if(!alert.empty())
+	{
+		//alert = "Not OK services :\n" + alert;
+	}
 	return alert;
 }
 
@@ -119,7 +151,8 @@ std::string Parser::parseName(const std::string &name)
 	while(i < name.size() && c != ' ')
 	{
 		c = name[i];
-		result += c;
+		if(c != ' ')
+			result += c;
 		i++;
 	}
 
