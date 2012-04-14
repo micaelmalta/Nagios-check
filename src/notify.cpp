@@ -5,17 +5,18 @@
 #include <fstream>
 #include <sstream>
 #include <SFML/Graphics.hpp>
+#include <gtkmm.h>
+#include "notify.hpp"
 #include "Parser.hpp"
+#include "ConfigParser.hpp"
 
-using namespace std;
-
-string read(const string &filename)
+std::string read(const std::string &filename)
 {
 	Parser *parser = new Parser();
 
-	string line;
+	std::string line;
 
-	ifstream myfile (filename.c_str());
+	std::ifstream myfile (filename.c_str());
 	if (myfile.is_open())
 	{
 		while ( myfile.good() )
@@ -26,80 +27,63 @@ string read(const string &filename)
 		myfile.close();
 	}
 
-	else cout << "Unable to open file"; 
-	
-	std::string alerte = parser->getAlert();
+	else std::cout << "Unable to open file";
+
+	std::string alerte = getAlert(parser);
 
 	delete parser;
 
 	return alerte;
-	
+
 }
 
-int main()
+std::vector <ConfigParser::Host> readConfig(const std::string &filename)
 {
-	stringstream ss;
+	ConfigParser *configParser = new ConfigParser();
 
-	sf::Clock mainClock;
-	
-	float x = 0, y = 0;
-	string filename = "/tmp/status.dat";
-	ss << "scp -q root@monitoring.serieslive.com:/usr/local/nagios/var/status.dat " << filename;
-	
-	//system(ss.str().c_str());
-	std::string alert = read(filename);
+	std::string line;
+
+	std::ifstream myfile (filename.c_str());
+	if (myfile.is_open())
+	{
+		while ( myfile.good() )
+		{
+			getline (myfile,line);
+			configParser->treatLine(line);
+		}
+		myfile.close();
+	}
+
+	else std::cout << "Unable to open file";
+
+	std::vector <ConfigParser::Host> config = configParser->getHosts();
+
+	delete configParser;
+
+	return config;
+
+}
+
+std::string getAlert(Parser *parser)
+{
+	std::vector <Parser::ServiceStatus> services = parser->getServices();
+
+	std::vector <Parser::ServiceStatus>::iterator it;
+	std::string alert = "";
+
+	for(it = services.begin(); it != services.end(); it++)
+	{
+		Parser::ServiceStatus status = *it;
+		if(status.status != Parser::OK)
+		{
+			alert += status.hostName + " : " + status.serviceName + "\n" + status.output + "\n\n";
+		}
+	}
 	if(!alert.empty())
 	{
-
-		sf::RenderWindow *window = new sf::RenderWindow(sf::VideoMode(400, 200, 8),
-												"Nagios Notify", sf::Style::Close);
-
-		mainClock.Reset();
-		while(window->IsOpened())
-		{
-			sf::Event e;
-			window->GetEvent(e);
-			if(e.Type == sf::Event::Closed)
-				window->Close();
-
-			//Rendu
-			window->Clear();
-
-			sf::String text(alert);
-			text.SetSize(16);
-
-			sf::FloatRect rect = sf::FloatRect(0, 0, 400, 200);
-			sf::Vector2f buttonCenter(
-						rect.Left+(rect.Right-rect.Left)/2.f,
-						rect.Top+(rect.Bottom-rect.Top)/2.f
-						);
-
-			sf::FloatRect tr = text.GetRect();
-
-			text.SetPosition( buttonCenter.x - ((tr.Right-tr.Left)/2.f),
-									buttonCenter.y - ((tr.Bottom-tr.Top)/2.f) - 2
-									);
-//			text.SetPosition( buttonCenter.x - ((tr.Right-tr.Left)/2.f),
-//									buttonCenter.y - ((tr.Bottom-tr.Top)/2.f) - 2
-//									);
-
-
-			window->Draw(text);
-
-//			if(mainClock.GetElapsedTime() > 6.f)
-//				window->Close();
-
-			window->Display();
-
-		}
-
-//		notify_init("verify");
-//		NotifyNotification * notif = notify_notification_new (
-//					"Check result :",
-//					alert.c_str(),
-//					"dialog-information");
-//		notify_notification_show (notif, NULL);
+		//alert = "Not OK services :\n" + alert;
 	}
-	
-	return 0;
+	return alert;
 }
+
+

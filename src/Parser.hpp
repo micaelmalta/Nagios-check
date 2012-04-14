@@ -7,12 +7,8 @@
 
 class Parser
 {
-public:
-	Parser();
-	void treatLine(const std::string &line);
-	std::string getAlert();
 
-private:
+public:
 	enum Status {
 		OK,
 		WARNING,
@@ -27,6 +23,14 @@ private:
 		std::string output;
 		Parser::Status status;
 	};
+
+public:
+	Parser();
+	void treatLine(const std::string &line);
+	std::string getAlert();
+	std::vector <ServiceStatus>  getServices();
+
+private:
 
 	std::string parseName(const std::string &name);
 	Parser::Status getStatus(const std::string &name);

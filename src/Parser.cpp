@@ -12,7 +12,6 @@ Parser::Parser()
 	currentStatus = Parser::OK;
 }
 
-
 void Parser::treatLine(const std::string &line)
 {
 	if(!line.empty() && line[0] != '#' && line[0] != '\t')
@@ -67,6 +66,11 @@ void Parser::treatLine(const std::string &line)
 
 }
 
+std::vector <Parser::ServiceStatus>  Parser::getServices()
+{
+	return services;
+}
+
 Parser::Status Parser::getStatus(const std::string &name)
 {
 	if(name.compare("0") == 0)
@@ -91,30 +95,10 @@ Parser::Status Parser::getStatus(const std::string &name)
 	}
 }
 
-std::string Parser::getAlert()
-{
-	std::vector <ServiceStatus>::iterator it;
-	std::string alert = "";
-
-	for(it = services.begin(); it != services.end(); it++)
-	{
-		ServiceStatus status = *it;
-		if(status.status != Parser::OK)
-		{
-			alert += status.hostName + " : " + status.serviceName + "\n" + status.output + "\n\n";
-		}
-	}
-	if(!alert.empty())
-	{
-		//alert = "Not OK services :\n" + alert;
-	}
-	return alert;
-}
-
 std::vector <std::string> Parser::parseAttribute(const std::string &name)
 {
 	std::vector <std::string> result;
-	int i = 1;
+	unsigned int i = 1;
 	char c = '\0';
 	std::string key = "";
 	std::string val = "";
@@ -144,7 +128,7 @@ std::vector <std::string> Parser::parseAttribute(const std::string &name)
 std::string Parser::parseName(const std::string &name)
 {
 	std::string result = "";
-	int i = 0;
+	unsigned int i = 0;
 	char c = '\0';
 	c = name[i];
 
