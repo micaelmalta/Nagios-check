@@ -1,4 +1,3 @@
-#include <libnotify/notify.h>
 #include <string>
 #include <iostream>
 #include <cstdlib>
@@ -34,7 +33,7 @@ int main(int argc, char * argv[])
 	{
 		ss.str("");
 
-		ss << "scp "
+		ss << "scp -q "
 			<< config[i].userName
 			<< "@"
 			<< config[i].hostName

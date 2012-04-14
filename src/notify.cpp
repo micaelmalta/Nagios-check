@@ -1,10 +1,8 @@
 #include <iostream>
-#include <libnotify/notify.h>
 #include <string>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
-#include <SFML/Graphics.hpp>
 #include <gtkmm.h>
 #include "notify.hpp"
 #include "Parser.hpp"
